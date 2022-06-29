@@ -1,0 +1,16 @@
+<library path="vision_msgs_rviz_plugins">
+
+    <!-- Displays plugins -->
+  
+    <class
+      name="vision_msgs_rviz_plugins/Detection3D"
+      type="rviz_plugins::Detection3DArrayDisplay"
+      base_class_type="rviz_common::Display"
+    >
+      <description>
+        Convert an array of bounding boxes to markers and display them.
+      </description>
+      <message_type>vision_msgs::msg::Detection3DArray</message_type>
+    </class>
+  
+  </library>
