@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  "push":
+    branches: [main]
+
+jobs:
+  build:
+    name: Build on ros ${{ matrix.ros_distribution }} and ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-22.04]
+        include:
+          - os: ubuntu-20.04
+            ros_distribution: "foxy"
+          - os: ubuntu-22.04
+            ros_distribution: "humble"
+      fail-fast: false
+    steps:
+      - name: Setup ROS2 ${{ matrix.ros_distribution }}
+        uses: ros-tooling/setup-ros@v0.3
+        with:
+          required-ros-distributions: ${{ matrix.ros_distribution }}
+      - uses: actions/checkout@v2
+      - uses: ros-tooling/action-ros-ci@v0.2
+        with:
+          package-name: vision_msgs_rviz_plugins
+          target-ros2-distro: ${{ matrix.ros_distribution }}
+          skip-tests: true
