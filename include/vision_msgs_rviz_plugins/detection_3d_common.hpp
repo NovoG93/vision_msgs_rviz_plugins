@@ -4,6 +4,8 @@
 #include <boost/algorithm/string.hpp>
 #include <memory>
 #include <string>
+#include <map>
+#include <algorithm>
 
 #include <rviz_common/display.hpp>
 #include <rviz_common/properties/bool_property.hpp>
@@ -45,7 +47,12 @@ namespace rviz_plugins
         float line_width, alpha;
         std::unique_ptr<MarkerCommon> m_marker_common;
         std::vector<BillboardLinePtr> edges_;
-
+        std::map<std::string, QColor> idToColorMap = {
+                {"car", QColor(255, 165, 0)},
+                {"person", QColor(0, 0, 255)},
+                {"cyclist", QColor(255, 255, 0)},
+                {"motorcycle", QColor(230, 230, 250)}
+            };
         visualization_msgs::msg::Marker::SharedPtr get_marker(
             const vision_msgs::msg::BoundingBox3D &box) const
         {
@@ -67,47 +74,38 @@ namespace rviz_plugins
 
             return marker;
         }
-        QColor getColor(bool is_tracking, std::string id = "")
+        QColor getColor(std::string id = "") const
         {
             QColor color;
-            if (id == "")
-            {
-                if (is_tracking)
-                    color.setRgb(22, 255, 80, 255);
-                else
-                    color.setRgb(255, 22, 80, 255);
-            }
-            else
-            {
-                if (boost::to_lower_copy(id) == "car")
-                    color.setRgb(255, 165, 0); // orange
-                else if (boost::to_lower_copy(id) == "person")
-                    color.setRgb(0, 0, 255); // blue
-                else if (boost::to_lower_copy(id) == "cyclist")
-                    color.setRgb(255, 255, 0); // yellow
-                else if (boost::to_lower_copy(id) == "motorcycle")
-                    color.setRgb(230, 230, 250); // purple
-                else
-                    color.setRgb(190, 190, 190); // gray
+            if (id == "") {
+                color.setRgb(255, 22, 80, 255);
+            } else {
+                std::string lowercaseId = boost::to_lower_copy(id);
+                auto it = idToColorMap.find(lowercaseId);
+                if (it != idToColorMap.end()) {
+                color = it->second;
+                } else {
+                color.setRgb(190, 190, 190);
+                }
             }
             return color;
         }
 
-        void showBoxes(vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg)
+        void showBoxes(const vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg)
         {
             edges_.clear();
             for (size_t idx = 0U; idx < msg->detections.size(); idx++)
             {
                 const auto marker_ptr = get_marker(msg->detections[idx].bbox);
-                QColor color = getColor(msg->detections[idx].is_tracking);
+                QColor color = getColor(msg->detections[idx].results[0].hypothesis.class_id);
                 if (msg->detections[idx].results.size() > 0)
                 {
                     auto iter = std::max_element(msg->detections[idx].results.begin(),
                                                 msg->detections[idx].results.end(),
                                                 [](const auto & a, const auto & b){
-                                                    return a.score < b.score;
+                                                    return a.hypothesis.score < b.hypothesis.score;
                                                 });
-                    color = getColor(msg->detections[idx].is_tracking, iter->id);                    
+                    color = getColor(iter->hypothesis.class_id);
                 }
                 marker_ptr->color.r = color.red() / 255.0;
                 marker_ptr->color.g = color.green() / 255.0;
@@ -137,7 +135,7 @@ namespace rviz_plugins
             }
         }
 
-        void showEdges(vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg)
+        void showEdges(const vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg)
         {
             m_marker_common->clearMarkers();
 
@@ -146,16 +144,15 @@ namespace rviz_plugins
             for (size_t idx = 0; idx < msg->detections.size(); idx++)
             {
                 vision_msgs::msg::BoundingBox3D box = msg->detections[idx].bbox;
-                bool is_tracking = msg->detections[idx].is_tracking;
-                QColor color = getColor(is_tracking);
+                QColor color = getColor(msg->detections[idx].results[0].hypothesis.class_id);
                 if (msg->detections[idx].results.size() > 0)
                 {
                     auto iter = std::max_element(msg->detections[idx].results.begin(),
                                                 msg->detections[idx].results.end(),
                                                 [](const auto & a, const auto & b){
-                                                    return a.score < b.score;
+                                                    return a.hypothesis.score < b.hypothesis.score;
                                                 });
-                    color = getColor(msg->detections[idx].is_tracking, iter->id);                    
+                    color = getColor(iter->hypothesis.class_id);                 
                 }
                 geometry_msgs::msg::Vector3 dimensions = box.size;
 
