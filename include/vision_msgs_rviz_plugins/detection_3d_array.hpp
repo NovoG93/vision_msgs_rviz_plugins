@@ -7,6 +7,7 @@
 #include <rviz_common/properties/float_property.hpp>
 #include <rviz_default_plugins/displays/marker/marker_common.hpp>
 #include <rviz_default_plugins/displays/marker_array/marker_array_display.hpp>
+#include <rviz_default_plugins/displays/marker/markers/text_view_facing_marker.hpp>
 #include <rviz_rendering/objects/billboard_line.hpp>
 
 #include <vision_msgs/msg/bounding_box3_d.hpp>
@@ -46,14 +47,17 @@ namespace rviz_plugins
         vision_msgs::msg::Detection3DArray::ConstSharedPtr latest_msg;
 
     protected:
-        bool only_edge_;
+        bool only_edge_, show_score_;
         rviz_common::properties::BoolProperty * only_edge_property_;
         rviz_common::properties::FloatProperty * line_width_property_;
         rviz_common::properties::FloatProperty * alpha_property_;
+        rviz_common::properties::BoolProperty * show_score_property_;
+
     protected Q_SLOTS:
             void updateEdge();
             void updateLineWidth();
             void updateAlpha();
+            void updateShowScores();
     };
 } // namespace rviz_plugins
 

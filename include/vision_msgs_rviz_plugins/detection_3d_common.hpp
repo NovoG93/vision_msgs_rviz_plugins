@@ -47,12 +47,15 @@ namespace rviz_plugins
         float line_width, alpha;
         std::unique_ptr<MarkerCommon> m_marker_common;
         std::vector<BillboardLinePtr> edges_;
+        std::unordered_map<int, visualization_msgs::msg::Marker::SharedPtr> score_markers;
+
         std::map<std::string, QColor> idToColorMap = {
                 {"car", QColor(255, 165, 0)},
                 {"person", QColor(0, 0, 255)},
                 {"cyclist", QColor(255, 255, 0)},
                 {"motorcycle", QColor(230, 230, 250)}
             };
+
         visualization_msgs::msg::Marker::SharedPtr get_marker(
             const vision_msgs::msg::BoundingBox3D &box) const
         {
@@ -74,6 +77,7 @@ namespace rviz_plugins
 
             return marker;
         }
+
         QColor getColor(std::string id = "") const
         {
             QColor color;
@@ -91,21 +95,31 @@ namespace rviz_plugins
             return color;
         }
 
-        void showBoxes(const vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg)
+        void showBoxes(const vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg, const bool show_score)
         {
             edges_.clear();
+            ClearScores(show_score);
+
             for (size_t idx = 0U; idx < msg->detections.size(); idx++)
             {
                 const auto marker_ptr = get_marker(msg->detections[idx].bbox);
-                QColor color = getColor(msg->detections[idx].results[0].hypothesis.class_id);
+                QColor color;
                 if (msg->detections[idx].results.size() > 0)
                 {
-                    auto iter = std::max_element(msg->detections[idx].results.begin(),
-                                                msg->detections[idx].results.end(),
-                                                [](const auto & a, const auto & b){
-                                                    return a.hypothesis.score < b.hypothesis.score;
-                                                });
-                    color = getColor(iter->hypothesis.class_id);
+                    auto iter = std::max_element(
+                    msg->detections[idx].results.begin(),
+                    msg->detections[idx].results.end(),
+                    [](const auto & a, const auto & b) {
+                        return a.hypothesis.score < b.hypothesis.score;
+                    });
+                    const auto & result_with_highest_score = *iter;
+                    color = getColor(result_with_highest_score.hypothesis.class_id);
+                    if (show_score)
+                        {
+                            ShowScore(msg->detections[idx], result_with_highest_score.hypothesis.score, idx);
+                        }
+                } else {
+                    color = getColor(msg->detections[idx].results[0].hypothesis.class_id);
                 }
                 marker_ptr->color.r = color.red() / 255.0;
                 marker_ptr->color.g = color.green() / 255.0;
@@ -135,9 +149,10 @@ namespace rviz_plugins
             }
         }
 
-        void showEdges(const vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg)
+        void showEdges(const vision_msgs::msg::Detection3DArray::ConstSharedPtr &msg, const bool show_score)
         {
             m_marker_common->clearMarkers();
+            ClearScores(show_score);
 
             allocateBillboardLines(msg->detections.size());
 
@@ -152,7 +167,11 @@ namespace rviz_plugins
                                                 [](const auto & a, const auto & b){
                                                     return a.hypothesis.score < b.hypothesis.score;
                                                 });
-                    color = getColor(iter->hypothesis.class_id);                 
+                    color = getColor(iter->hypothesis.class_id);
+                    if (show_score)
+                    {
+                        ShowScore(msg->detections[idx], iter->hypothesis.score, idx);
+                    }               
                 }
                 geometry_msgs::msg::Vector3 dimensions = box.size;
 
@@ -247,6 +266,43 @@ namespace rviz_plugins
                 edge->addPoint(H);
             }
         }
+
+        void ShowScore(const vision_msgs::msg::Detection3D detection, const double score, const size_t idx)
+        {
+            auto marker = std::make_shared<Marker>();
+            marker->type = Marker::TEXT_VIEW_FACING;
+            marker->action = Marker::ADD;
+            marker->header = detection.header;
+            marker->text = (std::ostringstream{} << std::fixed << std::setprecision(2) << score).str();
+            marker->scale.z = 0.5;  // Set the size of the text
+            marker->id = idx;
+            marker->ns = "score";
+            marker->color.r = 1.0f;
+            marker->color.g = 1.0f;
+            marker->color.b = 1.0f;
+            marker->color.a = alpha;
+            marker->pose.position.x = static_cast<double>(detection.bbox.center.position.x);
+            marker->pose.position.y = static_cast<double>(detection.bbox.center.position.y);
+            marker->pose.position.z = static_cast<double>(detection.bbox.center.position.z + (detection.bbox.size.z /2.0) * 1.2 );
+
+            // Add the marker to the MarkerArray message
+            m_marker_common->addMessage(marker);
+            score_markers[idx] = marker;
+        }
+
+        void ClearScores(const bool show_score)
+        {
+            if (! show_score)
+            {
+                for (auto &[id, marker] : score_markers)
+                {
+                    marker->action = visualization_msgs::msg::Marker::DELETE;
+                    m_marker_common->addMessage(marker);
+                }
+                score_markers.clear();
+            }
+        }
+
     };
 }
 

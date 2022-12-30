@@ -13,6 +13,8 @@ namespace rviz_plugins
             "Line Width", 0.05, "Line width of edges", this, SLOT(updateLineWidth()));
         alpha_property_ = new rviz_common::properties::FloatProperty(
             "Alpha", 1.0, "Transparency", this, SLOT(updateAlpha()));
+        show_score_property_ = new rviz_common::properties::BoolProperty(
+            "Show Score", false, "Display score next to bounding boxes", this, SLOT(updateShowScores()));
     }
 
     Detection3DArrayDisplay::~Detection3DArrayDisplay()
@@ -20,6 +22,7 @@ namespace rviz_plugins
         delete only_edge_property_;
         delete line_width_property_;
         delete alpha_property_;
+        delete show_score_property_;
     }
 
     void Detection3DArrayDisplay::onInitialize()
@@ -39,6 +42,9 @@ namespace rviz_plugins
 
         line_width = 0.2;
         alpha = 1.0;
+
+        only_edge_ = false;
+        show_score_ = false;
     }
 
     void Detection3DArrayDisplay::load(const rviz_common::Config &config)
@@ -53,11 +59,11 @@ namespace rviz_plugins
         latest_msg = msg;
         if (!only_edge_)
         {
-            showBoxes(msg);
+            showBoxes(msg, show_score_);
         }
         else
         {
-            showEdges(msg);
+            showEdges(msg, show_score_);
         }
     }
 
@@ -89,11 +95,11 @@ namespace rviz_plugins
         {
             if (only_edge_)
             {
-                showEdges(latest_msg);
+                showEdges(latest_msg, show_score_);
             }
             else
             {
-                showBoxes(latest_msg);
+                showBoxes(latest_msg, show_score_);
             }
         }
     }
@@ -116,6 +122,14 @@ namespace rviz_plugins
         }
     }
 
+    void Detection3DArrayDisplay::updateShowScores()
+    {
+        show_score_ = show_score_property_->getBool();
+        if (latest_msg)
+        {
+            processMessage(latest_msg);
+        }
+    }
 
 } // namespace rviz_plugins
 
