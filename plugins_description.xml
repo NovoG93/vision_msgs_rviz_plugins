@@ -3,7 +3,7 @@
     <!-- Displays plugins -->
   
     <class
-      name="vision_msgs_rviz_plugins/Detection3D"
+      name="vision_msgs_rviz_plugins/Detection3DArray"
       type="rviz_plugins::Detection3DArrayDisplay"
       base_class_type="rviz_common::Display"
     >
@@ -11,6 +11,16 @@
         Convert an array of bounding boxes to markers and display them.
       </description>
       <message_type>vision_msgs::msg::Detection3DArray</message_type>
+    </class>
+    <class
+      name="vision_msgs_rviz_plugins/Detection3D"
+      type="rviz_plugins::Detection3DDisplay"
+      base_class_type="rviz_common::Display"
+    >
+      <description>
+        Convert one bounding boxes to markers and display it.
+      </description>
+      <message_type>vision_msgs::msg::Detection3D</message_type>
     </class>
   
   </library>

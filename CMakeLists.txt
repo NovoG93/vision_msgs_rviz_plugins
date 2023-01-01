@@ -38,6 +38,7 @@ set(CMAKE_AUTOMOC ON)
 set(vision_msgs_rviz_plugins_headers_to_moc
   include/vision_msgs_rviz_plugins/detection_3d_common.hpp
   include/vision_msgs_rviz_plugins/detection_3d_array.hpp
+  include/vision_msgs_rviz_plugins/detection_3d.hpp
 )
 
 foreach(header "${vision_msgs_rviz_plugins_headers_to_moc}")
@@ -49,6 +50,7 @@ endforeach()
 ## The generated MOC files are included automatically as headers.
 set(vision_msgs_rviz_plugins_source_files
   src/detection_3d_array.cpp
+  src/detection_3d.cpp
 )
 
 
@@ -120,6 +122,7 @@ install(
 # Install Python executables
 install(PROGRAMS
   samples/Detection3DArray.py
+  samples/Detection3D.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

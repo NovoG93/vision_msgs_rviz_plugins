@@ -37,7 +37,7 @@ namespace rviz_plugins
         
         Detection3DCommon()
             : rviz_common::RosTopicDisplay<MessageType>()
-            , line_width(0.2), alpha()
+            , line_width(0.05), alpha()
             , m_marker_common(std::make_unique<MarkerCommon>(this)){};
         ~Detection3DCommon()
         {
@@ -130,6 +130,41 @@ namespace rviz_plugins
                 marker_ptr->id = idx;
                 m_marker_common->addMessage(marker_ptr);
             }
+        }
+
+        void showBoxes(const vision_msgs::msg::Detection3D::ConstSharedPtr &msg, const bool show_score)
+        {
+            edges_.clear();
+            ClearScores(show_score);
+
+            const auto marker_ptr = get_marker(msg->bbox);
+            QColor color;
+            if (msg->results.size() > 0)
+            {
+                auto iter = std::max_element(
+                msg->results.begin(),
+                msg->results.end(),
+                [](const auto & a, const auto & b) {
+                    return a.hypothesis.score < b.hypothesis.score;
+                });
+                const auto & result_with_highest_score = *iter;
+                color = getColor(result_with_highest_score.hypothesis.class_id);
+                if (show_score)
+                {
+                    ShowScore(*msg, result_with_highest_score.hypothesis.score, 0);
+                }
+            } else {
+                color = getColor(msg->results[0].hypothesis.class_id);
+            }
+            marker_ptr->color.r = color.red() / 255.0;
+            marker_ptr->color.g = color.green() / 255.0;
+            marker_ptr->color.b = color.blue() / 255.0;
+            marker_ptr->color.a = alpha;
+            marker_ptr->ns = "bounding_box";
+            marker_ptr->header = msg->header;
+            marker_ptr->id = 0;
+            m_marker_common->addMessage(marker_ptr);
+
         }
 
         void allocateBillboardLines(size_t num)
@@ -265,6 +300,122 @@ namespace rviz_plugins
                 edge->addPoint(D);
                 edge->addPoint(H);
             }
+        }
+
+        void showEdges(const vision_msgs::msg::Detection3D::ConstSharedPtr &msg, const bool show_score)
+        {
+            m_marker_common->clearMarkers();
+            ClearScores(show_score);
+
+            allocateBillboardLines(1);
+
+            QColor color;
+            if (msg->results.size() > 0)
+            {
+                auto iter = std::max_element(msg->results.begin(),
+                                             msg->results.end(),
+                                            [](const auto & a, const auto & b){
+                                                return a.hypothesis.score < b.hypothesis.score;
+                                            });
+                color = getColor(iter->hypothesis.class_id);
+                if (show_score)
+                {
+                    ShowScore(*msg, iter->hypothesis.score, 0);
+                }               
+            } else {
+                color = getColor(msg->results[0].hypothesis.class_id);
+            }
+            geometry_msgs::msg::Vector3 dimensions = msg->bbox.size;
+
+            BillboardLinePtr edge = edges_[0];
+            edge->clear();
+            Ogre::Vector3 position;
+            Ogre::Quaternion quaternion;
+            if (!this->context_->getFrameManager()->transform(msg->header, msg->bbox.center,
+                                                                position,
+                                                                quaternion))
+            {
+                std::ostringstream oss;
+                oss << "Error transforming pose";
+                oss << " from frame '" << msg->header.frame_id << "'";
+                oss << " to frame '" << qPrintable(this->fixed_frame_) << "'";
+                RVIZ_COMMON_LOG_ERROR_STREAM(oss.str());
+                this->setStatus(rviz_common::properties::StatusProperty::Error, "Transform", QString::fromStdString(oss.str()));
+                return;
+            }
+            edge->setPosition(position);
+            edge->setOrientation(quaternion);
+
+            edge->setMaxPointsPerLine(2);
+            edge->setNumLines(12);
+            edge->setLineWidth(line_width);
+            edge->setColor(color.red() / 255.0,
+                            color.green() / 255.0,
+                            color.blue() / 255.0,
+                            alpha);
+
+            Ogre::Vector3 A, B, C, D, E, F, G, H;
+            A[0] = dimensions.x / 2.0;
+            A[1] = dimensions.y / 2.0;
+            A[2] = dimensions.z / 2.0;
+            B[0] = -dimensions.x / 2.0;
+            B[1] = dimensions.y / 2.0;
+            B[2] = dimensions.z / 2.0;
+            C[0] = -dimensions.x / 2.0;
+            C[1] = -dimensions.y / 2.0;
+            C[2] = dimensions.z / 2.0;
+            D[0] = dimensions.x / 2.0;
+            D[1] = -dimensions.y / 2.0;
+            D[2] = dimensions.z / 2.0;
+
+            E[0] = dimensions.x / 2.0;
+            E[1] = dimensions.y / 2.0;
+            E[2] = -dimensions.z / 2.0;
+            F[0] = -dimensions.x / 2.0;
+            F[1] = dimensions.y / 2.0;
+            F[2] = -dimensions.z / 2.0;
+            G[0] = -dimensions.x / 2.0;
+            G[1] = -dimensions.y / 2.0;
+            G[2] = -dimensions.z / 2.0;
+            H[0] = dimensions.x / 2.0;
+            H[1] = -dimensions.y / 2.0;
+            H[2] = -dimensions.z / 2.0;
+
+            edge->addPoint(A);
+            edge->addPoint(B);
+            edge->finishLine();
+            edge->addPoint(B);
+            edge->addPoint(C);
+            edge->finishLine();
+            edge->addPoint(C);
+            edge->addPoint(D);
+            edge->finishLine();
+            edge->addPoint(D);
+            edge->addPoint(A);
+            edge->finishLine();
+            edge->addPoint(E);
+            edge->addPoint(F);
+            edge->finishLine();
+            edge->addPoint(F);
+            edge->addPoint(G);
+            edge->finishLine();
+            edge->addPoint(G);
+            edge->addPoint(H);
+            edge->finishLine();
+            edge->addPoint(H);
+            edge->addPoint(E);
+            edge->finishLine();
+            edge->addPoint(A);
+            edge->addPoint(E);
+            edge->finishLine();
+            edge->addPoint(B);
+            edge->addPoint(F);
+            edge->finishLine();
+            edge->addPoint(C);
+            edge->addPoint(G);
+            edge->finishLine();
+            edge->addPoint(D);
+            edge->addPoint(H);
         }
 
         void ShowScore(const vision_msgs::msg::Detection3D detection, const double score, const size_t idx)

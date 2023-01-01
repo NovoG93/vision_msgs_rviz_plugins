@@ -18,9 +18,8 @@ class pub_detection3_d_array(Node):
         super().__init__("pub_detection3_d_array_sample")
         self.__pub = self.create_publisher(
             Detection3DArray, "detection3_d_array", 10)
-        self.__timer = self.create_timer(0.5, self.pub_sample)
+        self.__timer = self.create_timer(0.1, self.pub_sample)
         self.__counter = 0
-        self.__msg_cnt = 5
         self.__header = Header()
         self.__msg_def = {
             "score": [0.0, 1.0, 2.0, 3.0, 1.0],
