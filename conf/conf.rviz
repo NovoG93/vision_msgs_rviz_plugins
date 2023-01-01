@@ -55,9 +55,9 @@ Visualization Manager:
       Line Width: 0.009999999776482582
       Name: Detection3D
       Namespaces:
-        score: true
-      Only Edge: true
-      Show Score: true
+        bounding_box: true
+      Only Edge: false
+      Show Score: false
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -71,9 +71,10 @@ Visualization Manager:
       Line Width: 0.009999999776482582
       Name: Detection3DArray
       Namespaces:
+        bounding_box: true
         score: true
-      Only Edge: true
-      Show Score: true
+      Only Edge: false
+      Show Score: false
       Topic:
         Depth: 5
         Durability Policy: Volatile
