@@ -59,7 +59,7 @@ class pub_detection3_d_array(Node):
         bbox.center.orientation.z = quat[2]
         bbox.center.orientation.w = quat[3]
         # Set the center position to a fixed value
-        bbox.center.position.x = 0.0
+        bbox.center.position.x = 1.5
         bbox.center.position.y = 0.0
         bbox.size.x = (self.__counter % 10 + 1) * 0.1
         bbox.size.y = ((self.__counter + 1) % 5 + 1) * 0.1

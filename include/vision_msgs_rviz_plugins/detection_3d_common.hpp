@@ -457,4 +457,4 @@ namespace rviz_plugins
     };
 }
 
-#endif
+#endif  // DETECTION_3D_COMMON_DISPLAY_HPP_

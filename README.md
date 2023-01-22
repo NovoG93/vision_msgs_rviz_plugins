@@ -16,8 +16,15 @@ This repo contains a RVIZ2 plugin to display [vision_msgs](https://github.com/ro
     - [x] Alpha
     - [x] Line or Box
     - [x] Linewidth
-- [ ] BoundingBox2DArray
-- [ ] BoundingBox2D
+- [x] BoundingBox3D
+    - [x] Alpha
+    - [x] Line or Box    
+        <span style="color:red">**Since no header in vision_msgs/BonudingBox visualizations uses rviz fixed frame for tf transformation**</span>
+    - [x] Linewidth
+- [x] BoundingBox3DArray
+    - [x] Alpha
+    - [x] Line or Box
+    - [x] Linewidth
 
 ![Bounding Box Array](assets/BBoxArray.gif)
 
@@ -32,7 +39,5 @@ $ cd ros2_ws && rosdep install --from src --ignore-src -r -y \
 
 __Testing:__
 ```bash
-$ cd ros2_ws/src/vision_msgs_rviz_plugins/conf && rviz2 -d conf.rviz
-$ ros2 run vision_msgs_rviz_plugins Detection3DArray.py
-$ ros2 run vision_msgs_rviz_plugins Detection3D.py
+$ ros2 launch vision_msgs_rviz_plugins test_all.launch.py 
 ```

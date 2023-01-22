@@ -34,11 +34,17 @@ namespace rviz_plugins
         using BoundingBox3D = vision_msgs::msg::BoundingBox3D;
         using Detection3DArray = vision_msgs::msg::Detection3DArray;
 
+        DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
         Detection3DArrayDisplay();
+        DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
         ~Detection3DArrayDisplay();
+        DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void onInitialize() override;
+        DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void load(const rviz_common::Config &config) override;
+        DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void update(float wall_dt, float ros_dt) override;
+        DETECTION_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void reset() override;
 
     private:

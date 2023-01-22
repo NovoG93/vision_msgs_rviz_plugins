@@ -39,6 +39,9 @@ set(vision_msgs_rviz_plugins_headers_to_moc
   include/vision_msgs_rviz_plugins/detection_3d_common.hpp
   include/vision_msgs_rviz_plugins/detection_3d_array.hpp
   include/vision_msgs_rviz_plugins/detection_3d.hpp
+  include/vision_msgs_rviz_plugins/bounding_box_3d_common.hpp
+  include/vision_msgs_rviz_plugins/bounding_box_3d.hpp
+  include/vision_msgs_rviz_plugins/bounding_box_3d_array.hpp
 )
 
 foreach(header "${vision_msgs_rviz_plugins_headers_to_moc}")
@@ -51,6 +54,8 @@ endforeach()
 set(vision_msgs_rviz_plugins_source_files
   src/detection_3d_array.cpp
   src/detection_3d.cpp
+  src/bounding_box_3d.cpp
+  src/bounding_box_3d_array.cpp
 )
 
 
@@ -113,6 +118,10 @@ install(
   DIRECTORY include/
   DESTINATION include/${PROJECT_NAME}
 )
+install(
+  DIRECTORY launch conf
+  DESTINATION share/${PROJECT_NAME}
+)
 
 install(
   DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/icons"
@@ -123,6 +132,8 @@ install(
 install(PROGRAMS
   samples/Detection3DArray.py
   samples/Detection3D.py
+  samples/BoundingBox3D.py
+  samples/BoundingBox3DArray.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

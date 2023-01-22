@@ -22,5 +22,25 @@
       </description>
       <message_type>vision_msgs::msg::Detection3D</message_type>
     </class>
+    <class
+      name="vision_msgs_rviz_plugins/BoundingBox3D"
+      type="rviz_plugins::BoundingBox3DDisplay"
+      base_class_type="rviz_common::Display"
+    >
+      <description>
+        Display Bounding Box 3D via markers or edges
+      </description>
+      <message_type>vision_msgs::msg::BoundingBox3D</message_type>
+    </class>
+    <class
+      name="vision_msgs_rviz_plugins/BoundingBox3DArray"
+      type="rviz_plugins::BoundingBox3DArrayDisplay"
+      base_class_type="rviz_common::Display"
+    >
+      <description>
+        Display Bounding Box 3D Array via markers or edges
+      </description>
+      <message_type>vision_msgs::msg::BoundingBox3DArray</message_type>
+    </class>
   
   </library>

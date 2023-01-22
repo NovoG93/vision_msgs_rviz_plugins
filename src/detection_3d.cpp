@@ -40,11 +40,11 @@ namespace rviz_plugins
         alpha_property_->setMax(1.0);
         alpha_property_->setMin(0.1);
 
-        line_width = 0.2;
-        alpha = 1.0;
+        line_width = line_width_property_->getFloat();
+        alpha = alpha_property_->getFloat();
 
-        only_edge_ = false;
-        show_score_ = false;
+        only_edge_ = only_edge_property_->getBool();
+        show_score_ = show_score_property_->getBool();
     }
 
     void Detection3DDisplay::load(const rviz_common::Config &config)
