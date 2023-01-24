@@ -13,11 +13,10 @@
 
 #include <QWidget>
 
-
 #include "vision_msgs_rviz_plugins/bounding_box_3d_common.hpp"
 #include "vision_msgs_rviz_plugins/visibility_control.hpp"
 
- typedef std::shared_ptr<rviz_rendering::BillboardLine> BillboardLinePtr;
+typedef std::shared_ptr<rviz_rendering::BillboardLine> BillboardLinePtr;
 
 namespace rviz_plugins
 {
@@ -25,23 +24,23 @@ namespace rviz_plugins
     class BoundingBox3DArrayDisplay
         : public BoundingBox3DCommon<vision_msgs::msg::BoundingBox3DArray>
     {
-    Q_OBJECT
+        Q_OBJECT
     public:
         using Marker = visualization_msgs::msg::Marker;
         using BoundingBox3D = vision_msgs::msg::BoundingBox3D;
         using BoundingBox3DArray = vision_msgs::msg::BoundingBox3DArray;
 
-        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC 
+        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
         BoundingBox3DArrayDisplay();
-        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC 
+        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
         ~BoundingBox3DArrayDisplay();
-        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC 
+        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void onInitialize() override;
-        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC 
+        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void load(const rviz_common::Config &config) override;
-        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC 
+        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void update(float wall_dt, float ros_dt) override;
-        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC 
+        BOUNDING_BOX_3D_ARRAY_DISPLAY_HPP_PUBLIC
         void reset() override;
 
     private:
@@ -51,15 +50,15 @@ namespace rviz_plugins
 
     protected:
         bool only_edge_;
-        rviz_common::properties::BoolProperty * only_edge_property_;
-        rviz_common::properties::FloatProperty * line_width_property_;
-        rviz_common::properties::FloatProperty * alpha_property_;
-        rviz_common::properties::ColorProperty * color_property_;
+        rviz_common::properties::BoolProperty *only_edge_property_;
+        rviz_common::properties::FloatProperty *line_width_property_;
+        rviz_common::properties::FloatProperty *alpha_property_;
+        rviz_common::properties::ColorProperty *color_property_;
     protected Q_SLOTS:
-            void updateEdge();
-            void updateLineWidth();
-            void updateAlpha();
-            void updateColor();
+        void updateEdge();
+        void updateLineWidth();
+        void updateAlpha();
+        void updateColor();
     };
 } // namespace rviz_plugins
 

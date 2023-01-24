@@ -152,7 +152,7 @@ namespace rviz_plugins
                 edge->setMaxPointsPerLine(2);
                 edge->setNumLines(12);
                 edge->setLineWidth(line_width);
-                edge->setColor(color.red()/255.0, color.green()/255.0, color.blue()/255.0, this->alpha);
+                edge->setColor(color.red() / 255.0, color.green() / 255.0, color.blue() / 255.0, this->alpha);
 
                 Ogre::Vector3 A, B, C, D, E, F, G, H;
                 A[0] = dimensions.x / 2.0;
@@ -229,13 +229,13 @@ namespace rviz_plugins
 
             std_msgs::msg::Header header;
             header.frame_id = qPrintable(this->fixed_frame_);
-            
+
             Ogre::Vector3 position;
             Ogre::Quaternion quaternion;
 
             if (!this->context_->getFrameManager()->transform(header, msg->center,
-                                                                position,
-                                                                quaternion))
+                                                              position,
+                                                              quaternion))
             {
                 std::ostringstream oss;
                 oss << "Error transforming pose";
@@ -252,7 +252,7 @@ namespace rviz_plugins
             edge->setMaxPointsPerLine(2);
             edge->setNumLines(12);
             edge->setLineWidth(line_width);
-            edge->setColor(color.red()/255.0, color.green()/255.0, color.blue()/255.0, this->alpha);
+            edge->setColor(color.red() / 255.0, color.green() / 255.0, color.blue() / 255.0, this->alpha);
 
             Ogre::Vector3 A, B, C, D, E, F, G, H;
             A[0] = dimensions.x / 2.0;

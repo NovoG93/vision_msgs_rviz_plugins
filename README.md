@@ -9,6 +9,7 @@ This repo contains a RVIZ2 plugin to display [vision_msgs](https://github.com/ro
     - [x] Alpha
     - [x] Line or Box
     - [x] Linewidth
+    - [x] Change color map based on provided yaml file
 - [x] Detection3D
   - [x] Display ObjectHypothesisWithPose/score
   - [x] Change color based on ObjectHypothesisWithPose/id [car: orange, person: blue, cyclist: yellow, motorcycle: purple, other: grey]
@@ -16,6 +17,7 @@ This repo contains a RVIZ2 plugin to display [vision_msgs](https://github.com/ro
     - [x] Alpha
     - [x] Line or Box
     - [x] Linewidth
+    - [x] Change color map based on provided yaml file
 - [x] BoundingBox3D
     - [x] Alpha
     - [x] Line or Box    

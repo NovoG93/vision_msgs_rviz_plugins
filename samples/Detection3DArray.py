@@ -22,8 +22,8 @@ class pub_detection3_d_array(Node):
         self.__counter = 0
         self.__header = Header()
         self.__msg_def = {
-            "score": [0.0, 1.0, 2.0, 3.0, 1.0],
-            "obj_id": ["", "", "car", "cyclist", "tree"]
+            "score": [0.0, 1.0, 2.0, 3.0, 1.0, 20.0, 40.0],
+            "obj_id": ["", "", "car", "cyclist", "tree", "house", "skateboard"]
         }
 
     def create_msg(self, bbox: BoundingBox3D, scores, obj_ids) -> Detection3D:

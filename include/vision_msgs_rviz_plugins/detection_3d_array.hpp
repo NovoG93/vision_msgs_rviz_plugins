@@ -16,11 +16,10 @@
 
 #include <QWidget>
 
-
 #include "vision_msgs_rviz_plugins/detection_3d_common.hpp"
 #include "vision_msgs_rviz_plugins/visibility_control.hpp"
 
- typedef std::shared_ptr<rviz_rendering::BillboardLine> BillboardLinePtr;
+typedef std::shared_ptr<rviz_rendering::BillboardLine> BillboardLinePtr;
 
 namespace rviz_plugins
 {
@@ -28,7 +27,7 @@ namespace rviz_plugins
     class Detection3DArrayDisplay
         : public Detection3DCommon<vision_msgs::msg::Detection3DArray>
     {
-    Q_OBJECT
+        Q_OBJECT
     public:
         using Marker = visualization_msgs::msg::Marker;
         using BoundingBox3D = vision_msgs::msg::BoundingBox3D;
@@ -54,16 +53,17 @@ namespace rviz_plugins
 
     protected:
         bool only_edge_, show_score_;
-        rviz_common::properties::BoolProperty * only_edge_property_;
-        rviz_common::properties::FloatProperty * line_width_property_;
-        rviz_common::properties::FloatProperty * alpha_property_;
-        rviz_common::properties::BoolProperty * show_score_property_;
+        rviz_common::properties::BoolProperty *only_edge_property_;
+        rviz_common::properties::FloatProperty *line_width_property_;
+        rviz_common::properties::FloatProperty *alpha_property_;
+        rviz_common::properties::BoolProperty *show_score_property_;
 
     protected Q_SLOTS:
-            void updateEdge();
-            void updateLineWidth();
-            void updateAlpha();
-            void updateShowScores();
+        void updateEdge();
+        void updateLineWidth();
+        void updateAlpha();
+        void updateShowScores();
+        void updateColorConfigs();
     };
 } // namespace rviz_plugins
 

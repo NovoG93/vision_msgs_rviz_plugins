@@ -6,10 +6,12 @@
 #include <string>
 #include <map>
 #include <algorithm>
+#include <yaml-cpp/yaml.h>
 
 #include <rviz_common/display.hpp>
 #include <rviz_common/properties/bool_property.hpp>
 #include <rviz_common/properties/float_property.hpp>
+#include <rviz_common/yaml_config_reader.hpp>
 #include <rviz_default_plugins/displays/marker/marker_common.hpp>
 #include <rviz_default_plugins/displays/marker_array/marker_array_display.hpp>
 #include <rviz_rendering/objects/billboard_line.hpp>
@@ -34,27 +36,24 @@ namespace rviz_plugins
         using Marker = visualization_msgs::msg::Marker;
         using BoundingBox3D = vision_msgs::msg::BoundingBox3D;
         using Detection3DArray = vision_msgs::msg::Detection3DArray;
-        
+
         Detection3DCommon()
-            : rviz_common::RosTopicDisplay<MessageType>()
-            , line_width(0.05), alpha()
-            , m_marker_common(std::make_unique<MarkerCommon>(this)){};
-        ~Detection3DCommon()
-        {
-        };
+            : rviz_common::RosTopicDisplay<MessageType>(), line_width(0.05), alpha(), m_marker_common(std::make_unique<MarkerCommon>(this)), color_config_path_(""){};
+        ~Detection3DCommon(){};
 
     protected:
         float line_width, alpha;
         std::unique_ptr<MarkerCommon> m_marker_common;
         std::vector<BillboardLinePtr> edges_;
+        std::string color_config_path_;
+        rviz_common::properties::StringProperty *string_property_;
         std::unordered_map<int, visualization_msgs::msg::Marker::SharedPtr> score_markers;
 
         std::map<std::string, QColor> idToColorMap = {
-                {"car", QColor(255, 165, 0)},
-                {"person", QColor(0, 0, 255)},
-                {"cyclist", QColor(255, 255, 0)},
-                {"motorcycle", QColor(230, 230, 250)}
-            };
+            {"car", QColor(255, 165, 0)},
+            {"person", QColor(0, 0, 255)},
+            {"cyclist", QColor(255, 255, 0)},
+            {"motorcycle", QColor(230, 230, 250)}};
 
         visualization_msgs::msg::Marker::SharedPtr get_marker(
             const vision_msgs::msg::BoundingBox3D &box) const
@@ -81,15 +80,21 @@ namespace rviz_plugins
         QColor getColor(std::string id = "") const
         {
             QColor color;
-            if (id == "") {
+            if (id == "")
+            {
                 color.setRgb(255, 22, 80, 255);
-            } else {
+            }
+            else
+            {
                 std::string lowercaseId = boost::to_lower_copy(id);
                 auto it = idToColorMap.find(lowercaseId);
-                if (it != idToColorMap.end()) {
-                color = it->second;
-                } else {
-                color.setRgb(190, 190, 190);
+                if (it != idToColorMap.end())
+                {
+                    color = it->second;
+                }
+                else
+                {
+                    color.setRgb(190, 190, 190);
                 }
             }
             return color;
@@ -107,18 +112,21 @@ namespace rviz_plugins
                 if (msg->detections[idx].results.size() > 0)
                 {
                     auto iter = std::max_element(
-                    msg->detections[idx].results.begin(),
-                    msg->detections[idx].results.end(),
-                    [](const auto & a, const auto & b) {
-                        return a.hypothesis.score < b.hypothesis.score;
-                    });
-                    const auto & result_with_highest_score = *iter;
+                        msg->detections[idx].results.begin(),
+                        msg->detections[idx].results.end(),
+                        [](const auto &a, const auto &b)
+                        {
+                            return a.hypothesis.score < b.hypothesis.score;
+                        });
+                    const auto &result_with_highest_score = *iter;
                     color = getColor(result_with_highest_score.hypothesis.class_id);
                     if (show_score)
-                        {
-                            ShowScore(msg->detections[idx], result_with_highest_score.hypothesis.score, idx);
-                        }
-                } else {
+                    {
+                        ShowScore(msg->detections[idx], result_with_highest_score.hypothesis.score, idx);
+                    }
+                }
+                else
+                {
                     color = getColor(msg->detections[idx].results[0].hypothesis.class_id);
                 }
                 marker_ptr->color.r = color.red() / 255.0;
@@ -142,18 +150,21 @@ namespace rviz_plugins
             if (msg->results.size() > 0)
             {
                 auto iter = std::max_element(
-                msg->results.begin(),
-                msg->results.end(),
-                [](const auto & a, const auto & b) {
-                    return a.hypothesis.score < b.hypothesis.score;
-                });
-                const auto & result_with_highest_score = *iter;
+                    msg->results.begin(),
+                    msg->results.end(),
+                    [](const auto &a, const auto &b)
+                    {
+                        return a.hypothesis.score < b.hypothesis.score;
+                    });
+                const auto &result_with_highest_score = *iter;
                 color = getColor(result_with_highest_score.hypothesis.class_id);
                 if (show_score)
                 {
                     ShowScore(*msg, result_with_highest_score.hypothesis.score, 0);
                 }
-            } else {
+            }
+            else
+            {
                 color = getColor(msg->results[0].hypothesis.class_id);
             }
             marker_ptr->color.r = color.red() / 255.0;
@@ -164,7 +175,6 @@ namespace rviz_plugins
             marker_ptr->header = msg->header;
             marker_ptr->id = 0;
             m_marker_common->addMessage(marker_ptr);
-
         }
 
         void allocateBillboardLines(size_t num)
@@ -198,15 +208,16 @@ namespace rviz_plugins
                 if (msg->detections[idx].results.size() > 0)
                 {
                     auto iter = std::max_element(msg->detections[idx].results.begin(),
-                                                msg->detections[idx].results.end(),
-                                                [](const auto & a, const auto & b){
-                                                    return a.hypothesis.score < b.hypothesis.score;
-                                                });
+                                                 msg->detections[idx].results.end(),
+                                                 [](const auto &a, const auto &b)
+                                                 {
+                                                     return a.hypothesis.score < b.hypothesis.score;
+                                                 });
                     color = getColor(iter->hypothesis.class_id);
                     if (show_score)
                     {
                         ShowScore(msg->detections[idx], iter->hypothesis.score, idx);
-                    }               
+                    }
                 }
                 geometry_msgs::msg::Vector3 dimensions = box.size;
 
@@ -314,15 +325,18 @@ namespace rviz_plugins
             {
                 auto iter = std::max_element(msg->results.begin(),
                                              msg->results.end(),
-                                            [](const auto & a, const auto & b){
-                                                return a.hypothesis.score < b.hypothesis.score;
-                                            });
+                                             [](const auto &a, const auto &b)
+                                             {
+                                                 return a.hypothesis.score < b.hypothesis.score;
+                                             });
                 color = getColor(iter->hypothesis.class_id);
                 if (show_score)
                 {
                     ShowScore(*msg, iter->hypothesis.score, 0);
-                }               
-            } else {
+                }
+            }
+            else
+            {
                 color = getColor(msg->results[0].hypothesis.class_id);
             }
             geometry_msgs::msg::Vector3 dimensions = msg->bbox.size;
@@ -332,8 +346,8 @@ namespace rviz_plugins
             Ogre::Vector3 position;
             Ogre::Quaternion quaternion;
             if (!this->context_->getFrameManager()->transform(msg->header, msg->bbox.center,
-                                                                position,
-                                                                quaternion))
+                                                              position,
+                                                              quaternion))
             {
                 std::ostringstream oss;
                 oss << "Error transforming pose";
@@ -350,9 +364,9 @@ namespace rviz_plugins
             edge->setNumLines(12);
             edge->setLineWidth(line_width);
             edge->setColor(color.red() / 255.0,
-                            color.green() / 255.0,
-                            color.blue() / 255.0,
-                            alpha);
+                           color.green() / 255.0,
+                           color.blue() / 255.0,
+                           alpha);
 
             Ogre::Vector3 A, B, C, D, E, F, G, H;
             A[0] = dimensions.x / 2.0;
@@ -425,7 +439,7 @@ namespace rviz_plugins
             marker->action = Marker::ADD;
             marker->header = detection.header;
             marker->text = (std::ostringstream{} << std::fixed << std::setprecision(2) << score).str();
-            marker->scale.z = 0.5;  // Set the size of the text
+            marker->scale.z = 0.5; // Set the size of the text
             marker->id = idx;
             marker->ns = "score";
             marker->color.r = 1.0f;
@@ -434,7 +448,7 @@ namespace rviz_plugins
             marker->color.a = alpha;
             marker->pose.position.x = static_cast<double>(detection.bbox.center.position.x);
             marker->pose.position.y = static_cast<double>(detection.bbox.center.position.y);
-            marker->pose.position.z = static_cast<double>(detection.bbox.center.position.z + (detection.bbox.size.z /2.0) * 1.2 );
+            marker->pose.position.z = static_cast<double>(detection.bbox.center.position.z + (detection.bbox.size.z / 2.0) * 1.2);
 
             // Add the marker to the MarkerArray message
             m_marker_common->addMessage(marker);
@@ -443,7 +457,7 @@ namespace rviz_plugins
 
         void ClearScores(const bool show_score)
         {
-            if (! show_score)
+            if (!show_score)
             {
                 for (auto &[id, marker] : score_markers)
                 {
@@ -454,7 +468,38 @@ namespace rviz_plugins
             }
         }
 
+        void updateColorConfig()
+        {
+            std::ostringstream oss;
+            const std::string tmp_path = string_property_->getStdString();
+            if (rcpputils::fs::exists(tmp_path))
+            {
+                color_config_path_ = tmp_path;
+                std::ifstream fin(color_config_path_);
+                YAML::Node config = YAML::Load(fin);
+                // Iterate through the YAML file
+                for (YAML::const_iterator it = config.begin(); it != config.end(); ++it)
+                {
+                    std::string key = it->first.as<std::string>();
+                    int r = it->second["r"].as<int>();
+                    int g = it->second["g"].as<int>();
+                    int b = it->second["b"].as<int>();
+                    // Create a QColor object with the RGB values
+                    QColor color = QColor(r, g, b);
+
+                    // Insert the key-value pair into the map
+                    idToColorMap[key] = color;
+                }
+                this->setStatus(rviz_common::properties::StatusProperty::Ok, "Config File", QString::fromStdString(oss.str()));
+            }
+            else
+            {
+                oss << " File: '" << string_property_->getStdString() << "' does not exist.";
+                RVIZ_COMMON_LOG_ERROR_STREAM(oss.str());
+                this->setStatus(rviz_common::properties::StatusProperty::Error, "Config File", QString::fromStdString(oss.str()));
+            }
+        }
     };
 }
 
-#endif  // DETECTION_3D_COMMON_DISPLAY_HPP_
+#endif // DETECTION_3D_COMMON_DISPLAY_HPP_
