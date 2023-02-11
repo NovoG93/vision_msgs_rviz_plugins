@@ -1,0 +1,49 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+    "image": "ros:humble-ros-core-jammy",
+    // "image": "ros:rolling-ros-core-jammy",
+    "remoteUser": "root",
+    "runArgs": [
+        "--network=host",
+        "--cap-add=SYS_PTRACE",
+        "--security-opt=seccomp:unconfined",
+        "--security-opt=apparmor:unconfined",
+        "--volume=/tmp/.X11-unix:/tmp/.X11-unix"
+    ],
+    "shutdownAction": "stopContainer",
+    "containerEnv": {
+        "DISPLAY": "${localEnv:DISPLAY}",
+        "LIBGL_ALWAYS_SOFTWARE": "1" // Needed for software rendering of opengl,
+    },
+    "remoteEnv": {
+		"PATH": "${containerEnv:PATH}:/opt/ros/${containerEnv:ROS_DISTRO}/bin",
+		"PYTHONPATH": "${containerEnv:PYTHONPATH}/opt/ros/${containerEnv:ROS_DISTRO}/lib/python3.10/site-packages:/opt/ros/${containerEnv:ROS_DISTRO}/local/lib/python3.10/dist-packages",
+		"DISPLAY": "${localEnv:DISPLAY}"
+	  },
+    // Set *default* container specific settings.json values on container create.
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "bash"
+                    }
+                },
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "althack.ament-task-provider",
+                "DotJoshJohnson.xml",
+                "ms-azuretools.vscode-docker",
+                "ms-python.python",
+                "ms-vscode.cpptools",
+                "redhat.vscode-yaml",
+                "smilerobotics.urdf",
+                "streetsidesoftware.code-spell-checker",
+                "twxs.cmake",
+                "yzhang.markdown-all-in-one",
+                "zachflower.uncrustify"
+            ]
+        }
+    }
+}

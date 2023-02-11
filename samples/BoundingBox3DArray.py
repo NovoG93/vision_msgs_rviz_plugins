@@ -1,12 +1,37 @@
 #!/usr/bin/env python3
+# Copyright 2023 Georg Novotny
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-from math import pi
+
+from math import pi, sin, cos
+from numpy import array
+from numpy.linalg import norm
 
 import rclpy
 from rclpy.node import Node
-import tf_transformations
 from std_msgs.msg import Header
 from vision_msgs.msg import BoundingBox3D, BoundingBox3DArray
+
+
+def quaternion_about_axis(angle, axis):
+    axis = array(axis)
+    axis = axis / norm(axis)
+    half_angle = angle / 2
+    sine = sin(half_angle)
+    w = cos(half_angle)
+    x, y, z = axis * sine
+    return x, y, z, w
 
 
 class pub_detection3_d_array(Node):
@@ -28,7 +53,7 @@ class pub_detection3_d_array(Node):
         for i in range(5):
             for j in range(5):
                 bbox = BoundingBox3D()
-                quat = tf_transformations.quaternion_about_axis(
+                quat = quaternion_about_axis(
                     (self.__counter % 100) * pi * 2 / 100.0, [0, 0, 1])
                 bbox.center.orientation.x = quat[0]
                 bbox.center.orientation.y = quat[1]
@@ -42,7 +67,7 @@ class pub_detection3_d_array(Node):
                 msg.boxes.append(bbox)
         self.__pub.publish(msg)
         self.__counter += 1
-        
+
 
 def main(args=None):
     rclpy.init(args=args)
