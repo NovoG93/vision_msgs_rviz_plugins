@@ -33,6 +33,12 @@ This repo contains a RVIZ2 plugin to display [vision_msgs](https://github.com/ro
 ## Install and Testing
 
 __Install:__
+1. Via apt:
+```bash
+sudo apt update && sudo apt install ros-$ROS_DISTRO-vision-msgs-rviz-plugins
+```
+
+2. From source:
 ```bash
 $ cd ros2_ws/src && git clone https://github.com/NovoG93/vision_msgs_rviz_plugins -b humble
 $ cd ros2_ws && rosdep install --from src --ignore-src -r -y \

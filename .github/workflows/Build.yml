@@ -10,8 +10,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04]
         include:
+          - os: ubuntu-20.04
+            ros_distribution: "galactic"
           - os: ubuntu-22.04
             ros_distribution: "humble"
           - os: ubuntu-22.04
@@ -19,11 +20,10 @@ jobs:
       fail-fast: false
     steps:
       - name: Setup ROS2 ${{ matrix.ros_distribution }}
-        uses: ros-tooling/setup-ros@v0.3
+        uses: ros-tooling/setup-ros@v0.6
         with:
           required-ros-distributions: ${{ matrix.ros_distribution }}
-      - uses: actions/checkout@v2
-      - uses: ros-tooling/action-ros-ci@v0.2
+      - uses: ros-tooling/action-ros-ci@v0.3
         with:
           package-name: vision_msgs_rviz_plugins
           target-ros2-distro: ${{ matrix.ros_distribution }}
