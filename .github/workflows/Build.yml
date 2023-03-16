@@ -28,7 +28,7 @@ jobs:
           package-name: vision_msgs_rviz_plugins
           target-ros2-distro: ${{ matrix.ros_distribution }}
           skip-tests: false
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v3
         with:
           name: colcon-logs
           path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
