@@ -25,11 +25,30 @@ jobs:
           required-ros-distributions: ${{ matrix.ros_distribution }}
 
       - name: Build
+        id: build_step
         uses: ros-tooling/action-ros-ci@v0.3
         with:
           package-name: vision_msgs_rviz_plugins
           target-ros2-distro: ${{ matrix.ros_distribution }}
           skip-tests: true
+
+      - name: Set Badge Message
+        id: set_badge_message
+        run: |
+          if [ ${{ steps.build_step.outcome }} == "success" ]; then
+            echo "BUILD_STATUS=success" >> $GITHUB_ENV
+          else
+            echo "BUILD_STATUS=failure" >> $GITHUB_ENV
+          fi
+
+      - name: Create Badge
+        uses: schneegans/dynamic-badges-action@v1.6.0
+        with:
+          auth: ${{ secrets.GIST_SECRET }}
+          gistID: 7cd6108706f61416db4ffe69b18d51d9
+          filename: ${{ GITHUB_REPOSITORY_ID }}_${{ matrix.ros_distribution }}_build.json
+          label: ${{ matrix.ros_distribution }}
+          message: ${{ env.BUILD_STATUS }}
 
       - name: Test
         continue-on-error: true
