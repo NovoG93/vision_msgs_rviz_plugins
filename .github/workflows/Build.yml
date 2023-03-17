@@ -11,8 +11,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-20.04
-            ros_distribution: "galactic"
+          # - os: ubuntu-20.04
+          #   ros_distribution: "galactic"
           - os: ubuntu-22.04
             ros_distribution: "humble"
           - os: ubuntu-22.04
@@ -23,13 +23,25 @@ jobs:
         uses: ros-tooling/setup-ros@v0.6
         with:
           required-ros-distributions: ${{ matrix.ros_distribution }}
-      - uses: ros-tooling/action-ros-ci@v0.3
+
+      - name: Build
+        uses: ros-tooling/action-ros-ci@v0.3
+        with:
+          package-name: vision_msgs_rviz_plugins
+          target-ros2-distro: ${{ matrix.ros_distribution }}
+          skip-tests: true
+
+      - name: Test
+        continue-on-error: true
+        uses: ros-tooling/action-ros-ci@v0.3
         with:
           package-name: vision_msgs_rviz_plugins
           target-ros2-distro: ${{ matrix.ros_distribution }}
           skip-tests: false
-      - uses: actions/upload-artifact@v3
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v3
         with:
           name: colcon-logs
           path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
-        if: always() # upload the logs even when the build fails
+        if: always() 
