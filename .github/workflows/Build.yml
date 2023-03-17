@@ -46,7 +46,7 @@ jobs:
         with:
           auth: ${{ secrets.GIST_SECRET }}
           gistID: 7cd6108706f61416db4ffe69b18d51d9
-          filename: ${{ GITHUB_REPOSITORY_ID }}_${{ matrix.ros_distribution }}_build.json
+          filename: ${{ env.GITHUB_REPOSITORY_ID }}_${{ matrix.ros_distribution }}_build.json
           label: ${{ matrix.ros_distribution }}
           message: ${{ env.BUILD_STATUS }}
 
